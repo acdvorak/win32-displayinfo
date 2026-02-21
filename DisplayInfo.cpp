@@ -1,18 +1,46 @@
 #include "DisplayConfig/DisplayConfig.h"
 
 #include <shellscalingapi.h>
+#include <nlohmann/json.hpp>
 
 #include <iostream>
 #include <map>
 #include <cmath>
+#include <string_view>
 
 #include <dxgi.h>
 #include <dxgi1_6.h>
 
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
+using nlohmann::json;
 
 std::map<std::wstring, std::pair<long, DXGI_COLOR_SPACE_TYPE>> monitors;
+
+static std::string WideToUtf8(const wchar_t* value)
+{
+	if (!value || !*value) {
+		return {};
+	}
+
+	const int required = WideCharToMultiByte(CP_UTF8, 0, value, -1, nullptr, 0, nullptr, nullptr);
+	if (required <= 1) {
+		return {};
+	}
+
+	std::string utf8(static_cast<size_t>(required), '\0');
+	WideCharToMultiByte(CP_UTF8, 0, value, -1, utf8.data(), required, nullptr, nullptr);
+	utf8.resize(static_cast<size_t>(required - 1));
+	return utf8;
+}
+
+static json Utf8OrNull(const wchar_t* value)
+{
+	if (!value || !*value) {
+		return nullptr;
+	}
+	return WideToUtf8(value);
+}
 
 static BOOL CALLBACK EnumProc(HMONITOR hMonitor, HDC, LPRECT, LPARAM)
 {
@@ -80,8 +108,114 @@ static std::wstring ColorModeToStr(DISPLAYCONFIG_ADVANCED_COLOR_MODE ColorMode)
 	return str;
 }
 
-int main()
+static void PrintUsage()
 {
+	std::wcout << L"Usage: DisplayInfo [--json]\n"
+			   << L"  --json    Output structured JSON (pretty-printed)\n";
+}
+
+static json DisplayConfigToJson(const DisplayConfig_t& config, long dpiScalePercent, DXGI_COLOR_SPACE_TYPE colorSpace)
+{
+	json item;
+	item["displayName"] = Utf8OrNull(config.displayName);
+	item["monitorName"] = Utf8OrNull(config.monitorName);
+	item["summary"] = WideToUtf8(DisplayConfigToString(config).c_str());
+
+	if (config.width && config.height) {
+		item["resolution"] = {
+			{"width", config.width},
+			{"height", config.height},
+		};
+	} else {
+		item["resolution"] = nullptr;
+	}
+
+	if (config.refreshRate.Denominator != 0 && config.refreshRate.Numerator != 0) {
+		item["refreshRateHz"] = static_cast<double>(config.refreshRate.Numerator) / static_cast<double>(config.refreshRate.Denominator);
+	} else {
+		item["refreshRateHz"] = nullptr;
+	}
+
+	item["outputTechnology"] = {
+		{"value", config.outputTechnology},
+		{"name", OutputTechnologyToString(config.outputTechnology) ? WideToUtf8(OutputTechnologyToString(config.outputTechnology)) : std::string()},
+	};
+
+	item["scanLineOrdering"] = {
+		{"value", config.scanLineOrdering},
+		{"interlaced", config.scanLineOrdering >= DISPLAYCONFIG_SCANLINE_ORDERING_INTERLACED},
+	};
+
+	if (dpiScalePercent > 0) {
+		item["dpiScalingPercent"] = dpiScalePercent;
+	} else {
+		item["dpiScalingPercent"] = nullptr;
+	}
+
+	if (colorSpace != DXGI_COLOR_SPACE_RESERVED) {
+		item["dxgiColorSpace"] = {
+			{"value", colorSpace},
+			{"name", WideToUtf8(ColorSpaceToStr(colorSpace).c_str())},
+		};
+	} else {
+		item["dxgiColorSpace"] = nullptr;
+	}
+
+	if (config.bitsPerChannel) {
+		const wchar_t* colorEncoding = ColorEncodingToString(config.colorEncoding);
+		item["color"] = {
+			{"bitsPerChannel", config.bitsPerChannel},
+			{"encoding", colorEncoding ? WideToUtf8(colorEncoding) : std::string()},
+			{"hdrSupported", config.HDRSupported()},
+			{"hdrEnabled", config.HDREnabled()},
+		};
+
+		if (SysVersion::IsWin11_24H2OrGreater()) {
+			auto& colors = config.windows1124H2Colors;
+			item["color"]["advancedColor"] = {
+				{"advancedColorSupported", colors.advancedColorSupported},
+				{"advancedColorActive", colors.advancedColorActive},
+				{"advancedColorLimitedByPolicy", colors.advancedColorLimitedByPolicy},
+				{"highDynamicRangeSupported", colors.highDynamicRangeSupported},
+				{"highDynamicRangeUserEnabled", colors.highDynamicRangeUserEnabled},
+				{"wideColorSupported", colors.wideColorSupported},
+				{"wideColorUserEnabled", colors.wideColorUserEnabled},
+				{"activeColorMode", WideToUtf8(ColorModeToStr(colors.activeColorMode).c_str())},
+			};
+		} else {
+			auto& colors = config.advancedColor;
+			item["color"]["advancedColor"] = {
+				{"advancedColorSupported", colors.advancedColorSupported},
+				{"advancedColorEnabled", colors.advancedColorEnabled},
+				{"wideColorEnforced", colors.wideColorEnforced},
+				{"advancedColorForceDisabled", colors.advancedColorForceDisabled},
+			};
+		}
+	} else {
+		item["color"] = nullptr;
+	}
+
+	return item;
+}
+
+int wmain(int argc, wchar_t* argv[])
+{
+	bool jsonOutput = false;
+
+	for (int i = 1; i < argc; ++i) {
+		std::wstring_view arg = argv[i];
+		if (arg == L"--json") {
+			jsonOutput = true;
+		} else if (arg == L"-h" || arg == L"--help") {
+			PrintUsage();
+			return 0;
+		} else {
+			std::wcerr << L"Unknown option: " << arg << L"\n\n";
+			PrintUsage();
+			return 1;
+		}
+	}
+
 	if (SysVersion::IsWin10_1607OrGreater()) {
 		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 		EnumDisplayMonitors(nullptr, nullptr, EnumProc, 0);
@@ -113,15 +247,30 @@ int main()
 
 	std::vector<DisplayConfig_t> displayConfigs;
 	if (GetDisplayConfigs(displayConfigs)) {
+		json payload;
+		if (jsonOutput) {
+			payload["displays"] = json::array();
+		}
+
 		for (const auto& config : displayConfigs) {
-			auto str = L"\r\nDisplay: " + DisplayConfigToString(config);
+			long dpiScalePercent = 0;
+			DXGI_COLOR_SPACE_TYPE colorSpace = DXGI_COLOR_SPACE_RESERVED;
 			if (auto it = monitors.find(config.displayName); it != monitors.end()) {
-				if (it->second.second != DXGI_COLOR_SPACE_RESERVED) {
-					str.append(std::format(L", Color Space: {}", ColorSpaceToStr(it->second.second)));
-				}
-				if (it->second.first) {
-					str.append(std::format(L"\n         DPI scaling factor: {}%", it->second.first));
-				}
+				dpiScalePercent = it->second.first;
+				colorSpace = it->second.second;
+			}
+
+			if (jsonOutput) {
+				payload["displays"].push_back(DisplayConfigToJson(config, dpiScalePercent, colorSpace));
+				continue;
+			}
+
+			auto str = L"\r\nDisplay: " + DisplayConfigToString(config);
+			if (colorSpace != DXGI_COLOR_SPACE_RESERVED) {
+				str.append(std::format(L", Color Space: {}", ColorSpaceToStr(colorSpace)));
+			}
+			if (dpiScalePercent) {
+				str.append(std::format(L"\n         DPI scaling factor: {}%", dpiScalePercent));
 			}
 			std::wcout << str << std::endl;
 			if (config.bitsPerChannel) {
@@ -153,5 +302,11 @@ int main()
 				}
 			}
 		}
+
+		if (jsonOutput) {
+			std::cout << payload.dump(2) << std::endl;
+		}
 	}
+
+	return 0;
 }

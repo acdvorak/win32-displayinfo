@@ -4,6 +4,14 @@ Win32 CLI.
 
 Shows a summary of connected/enabled displays.
 
+## Usage
+
+```ps1
+DisplayInfo.exe
+
+DisplayInfo.exe --json
+```
+
 ## Example output
 
 ### Windows 10 PC
@@ -25,6 +33,48 @@ Display: QCQ95S [\\.\DISPLAY1] 1900x1058@60.000 DVI, Color Space: DXGI_COLOR_SPA
 Display: DELL ST2320L [\\.\DISPLAY2] 1920x1080@60.000 DVI, Color Space: DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
          DPI scaling factor: 175%
   Color: RGB 8-bit
+```
+
+```json
+{
+  "displays": [
+    {
+      "displayName": "\\\\.\\DISPLAY1",
+      "monitorName": "DELL ST2320L",
+      "summary": "DELL ST2320L [\\\\.\\DISPLAY1] 1920x1080@60.000 HDMI",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "refreshRateHz": 60.0,
+      "outputTechnology": {
+        "value": 5,
+        "name": "HDMI"
+      },
+      "scanLineOrdering": {
+        "value": 1,
+        "interlaced": false
+      },
+      "dpiScalingPercent": 125,
+      "dxgiColorSpace": {
+        "value": 0,
+        "name": "DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709"
+      },
+      "color": {
+        "bitsPerChannel": 8,
+        "encoding": "RGB",
+        "hdrSupported": false,
+        "hdrEnabled": false,
+        "advancedColor": {
+          "advancedColorSupported": false,
+          "advancedColorEnabled": false,
+          "wideColorEnforced": false,
+          "advancedColorForceDisabled": false
+        }
+      }
+    }
+  ]
+}
 ```
 
 Over Remote Desktop:
