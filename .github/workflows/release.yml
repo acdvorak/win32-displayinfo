@@ -27,7 +27,13 @@ jobs:
           } else {
             $cmakeArch = "x64"
           }
-          cmake -B ${{github.workspace}}/build-${{ matrix.arch }} -A $cmakeArch -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+          $cmakeArgs = @(
+            "-B", "${{ github.workspace }}/build-${{ matrix.arch }}"
+            "-A", $cmakeArch
+            "-DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}"
+            "-DDISPLAYINFO_RELEASE_TAG=${{ github.event.release.tag_name }}"
+          )
+          cmake @cmakeArgs
 
       - name: Build
         run: |

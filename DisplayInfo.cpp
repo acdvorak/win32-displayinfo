@@ -16,6 +16,18 @@
 using Microsoft::WRL::ComPtr;
 using nlohmann::json;
 
+#ifndef DISPLAYINFO_VERSION_TAG
+#define DISPLAYINFO_VERSION_TAG "v0.0.0"
+#endif
+
+#ifndef DISPLAYINFO_GIT_COMMIT
+#define DISPLAYINFO_GIT_COMMIT "unknown"
+#endif
+
+#ifndef DISPLAYINFO_BUILD_TIMESTAMP
+#define DISPLAYINFO_BUILD_TIMESTAMP "unknown"
+#endif
+
 std::map<std::wstring, std::pair<long, DXGI_COLOR_SPACE_TYPE>> monitors;
 
 static std::string WideToUtf8(const wchar_t* value)
@@ -33,6 +45,22 @@ static std::string WideToUtf8(const wchar_t* value)
 	WideCharToMultiByte(CP_UTF8, 0, value, -1, utf8.data(), required, nullptr, nullptr);
 	utf8.resize(static_cast<size_t>(required - 1));
 	return utf8;
+}
+
+static std::wstring Utf8ToWide(std::string_view value)
+{
+	if (value.empty()) {
+		return {};
+	}
+
+	const int required = MultiByteToWideChar(CP_UTF8, 0, value.data(), static_cast<int>(value.size()), nullptr, 0);
+	if (required <= 0) {
+		return {};
+	}
+
+	std::wstring wide(static_cast<size_t>(required), L'\0');
+	MultiByteToWideChar(CP_UTF8, 0, value.data(), static_cast<int>(value.size()), wide.data(), required);
+	return wide;
 }
 
 static json Utf8OrNull(const wchar_t* value)
@@ -151,7 +179,11 @@ static void PrintUsage()
 		<< L"Options:\n"
 		<< L"  --json         Output structured JSON (pretty-printed)\n"
 		<< L"  -h | --help    Show this help\n"
-		<< L"  /h | /help\n";
+		<< L"  /h | /help\n\n"
+		<< L"Build metadata:\n"
+		<< L"  Version: " << Utf8ToWide(DISPLAYINFO_VERSION_TAG) << L"\n"
+		<< L"  Commit:  " << Utf8ToWide(DISPLAYINFO_GIT_COMMIT) << L"\n"
+		<< L"  Built:   " << Utf8ToWide(DISPLAYINFO_BUILD_TIMESTAMP) << L"\n";
 }
 
 static json DisplayConfigToJson(const DisplayConfig_t& config, long dpiScalePercent, DXGI_COLOR_SPACE_TYPE colorSpace)
