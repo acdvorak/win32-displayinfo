@@ -26,7 +26,7 @@ DisplayInfo.exe --json
 In-person physical displays (no RDP):
 
 ```
-Display: QCQ95S [\\.\DISPLAY1] 1900x1058@60.000 DVI, Color Space: DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
+Display: QCQ95S [\\.\DISPLAY1] 1900x1058@60.000 HDMI, Color Space: DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
          DPI scaling factor: 100%
   Color: RGB 8-bit
 
@@ -39,12 +39,12 @@ Display: DELL ST2320L [\\.\DISPLAY2] 1920x1080@60.000 DVI, Color Space: DXGI_COL
 {
   "displays": [
     {
+      "monitorName": "QCQ95S",
       "displayName": "\\\\.\\DISPLAY1",
-      "monitorName": "DELL ST2320L",
-      "summary": "DELL ST2320L [\\\\.\\DISPLAY1] 1920x1080@60.000 HDMI",
+      "summary": "QCQ95S [\\\\.\\DISPLAY1] 1900x1058@60.000 HDMI",
       "resolution": {
-        "width": 1920,
-        "height": 1080
+        "width": 1900,
+        "height": 1058
       },
       "refreshRateHz": 60.0,
       "outputTechnology": {
@@ -55,7 +55,7 @@ Display: DELL ST2320L [\\.\DISPLAY2] 1920x1080@60.000 DVI, Color Space: DXGI_COL
         "value": 1,
         "interlaced": false
       },
-      "dpiScalingPercent": 125,
+      "dpiScalingPercent": 100,
       "dxgiColorSpace": {
         "value": 0,
         "name": "DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709"
@@ -66,10 +66,45 @@ Display: DELL ST2320L [\\.\DISPLAY2] 1920x1080@60.000 DVI, Color Space: DXGI_COL
         "hdrSupported": false,
         "hdrEnabled": false,
         "advancedColor": {
-          "advancedColorSupported": false,
           "advancedColorEnabled": false,
-          "wideColorEnforced": false,
-          "advancedColorForceDisabled": false
+          "advancedColorForceDisabled": false,
+          "advancedColorSupported": false,
+          "wideColorEnforced": false
+        }
+      }
+    },
+    {
+      "monitorName": "DELL ST2320L",
+      "displayName": "\\\\.\\DISPLAY2",
+      "summary": "DELL ST2320L [\\\\.\\DISPLAY2] 1920x1080@60.000 DVI",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "refreshRateHz": 60.0,
+      "outputTechnology": {
+        "value": 4,
+        "name": "DVI"
+      },
+      "scanLineOrdering": {
+        "value": 1,
+        "interlaced": false
+      },
+      "dpiScalingPercent": 175,
+      "dxgiColorSpace": {
+        "value": 0,
+        "name": "DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709"
+      },
+      "color": {
+        "bitsPerChannel": 8,
+        "encoding": "RGB",
+        "hdrSupported": false,
+        "hdrEnabled": false,
+        "advancedColor": {
+          "advancedColorEnabled": false,
+          "advancedColorForceDisabled": false,
+          "advancedColorSupported": false,
+          "wideColorEnforced": false
         }
       }
     }
@@ -83,6 +118,48 @@ Over Remote Desktop:
 Display:  [\\.\DISPLAY97] 1608x965@32.000, Color Space: DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
          DPI scaling factor: 100%
   Color: RGB 8-bit
+```
+
+```json
+{
+  "displays": [
+    {
+      "monitorName": null,
+      "displayName": "\\\\.\\DISPLAY129",
+      "summary": " [\\\\.\\DISPLAY129] 1608x965@32.000",
+      "resolution": {
+        "width": 1608,
+        "height": 965
+      },
+      "refreshRateHz": 32.0,
+      "outputTechnology": {
+        "value": -1,
+        "name": ""
+      },
+      "scanLineOrdering": {
+        "value": 1,
+        "interlaced": false
+      },
+      "dpiScalingPercent": 100,
+      "dxgiColorSpace": {
+        "value": 0,
+        "name": "DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709"
+      },
+      "color": {
+        "bitsPerChannel": 8,
+        "encoding": "RGB",
+        "hdrEnabled": false,
+        "hdrSupported": false,
+        "advancedColor": {
+          "advancedColorEnabled": false,
+          "advancedColorForceDisabled": false,
+          "advancedColorSupported": false,
+          "wideColorEnforced": false
+        }
+      }
+    }
+  ]
+}
 ```
 
 ### Windows 7 Virtual Machine
