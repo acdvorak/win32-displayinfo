@@ -253,22 +253,22 @@ static json DisplayConfigToJson(const DisplayConfig_t& config, long dpiScalePerc
 		if (SysVersion::IsWin11_24H2OrGreater()) {
 			auto& colors = config.windows1124H2Colors;
 			item["color"]["advancedColor"] = {
-				{"advancedColorSupported", colors.advancedColorSupported},
-				{"advancedColorActive", colors.advancedColorActive},
-				{"advancedColorLimitedByPolicy", colors.advancedColorLimitedByPolicy},
-				{"highDynamicRangeSupported", colors.highDynamicRangeSupported},
-				{"highDynamicRangeUserEnabled", colors.highDynamicRangeUserEnabled},
-				{"wideColorSupported", colors.wideColorSupported},
-				{"wideColorUserEnabled", colors.wideColorUserEnabled},
+				{"advancedColorSupported", colors.advancedColorSupported != 0},
+				{"advancedColorActive", colors.advancedColorActive != 0},
+				{"advancedColorLimitedByPolicy", colors.advancedColorLimitedByPolicy != 0},
+				{"highDynamicRangeSupported", colors.highDynamicRangeSupported != 0},
+				{"highDynamicRangeUserEnabled", colors.highDynamicRangeUserEnabled != 0},
+				{"wideColorSupported", colors.wideColorSupported != 0},
+				{"wideColorUserEnabled", colors.wideColorUserEnabled != 0},
 				{"activeColorMode", WideToUtf8(ColorModeToStr(colors.activeColorMode).c_str())},
 			};
 		} else {
 			auto& colors = config.advancedColor;
 			item["color"]["advancedColor"] = {
-				{"advancedColorSupported", colors.advancedColorSupported},
-				{"advancedColorEnabled", colors.advancedColorEnabled},
-				{"wideColorEnforced", colors.wideColorEnforced},
-				{"advancedColorForceDisabled", colors.advancedColorForceDisabled},
+				{"advancedColorSupported", colors.advancedColorSupported != 0},
+				{"advancedColorEnabled", colors.advancedColorEnabled != 0},
+				{"wideColorEnforced", colors.wideColorEnforced != 0},
+				{"advancedColorForceDisabled", colors.advancedColorForceDisabled != 0},
 			};
 		}
 	} else {
