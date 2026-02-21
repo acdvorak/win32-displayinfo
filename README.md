@@ -83,3 +83,9 @@ Display:  [\\.\DISPLAY1] 1606x813@60.000 VGA
 - Windows 11 24H2+:
   - Wide color supported and enabled/disabled
   - Active color mode (SDR/WCG/HDR)
+
+## Vendored dependencies
+
+- `nlohmann/json` `v3.11.3` is vendored as a single header:
+  - `third_party/nlohmann/json.hpp`
+  - License: `third_party/nlohmann/LICENSE.MIT`
