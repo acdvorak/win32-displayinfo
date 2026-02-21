@@ -172,6 +172,34 @@ Display:  [\\.\DISPLAY97] 1608x965@32.000, Color Space: DXGI_COLOR_SPACE_RGB_FUL
 Display:  [\\.\DISPLAY1] 1606x813@60.000 VGA
 ```
 
+```json
+{
+  "displays": [
+    {
+      "monitorName": null,
+      "displayName": "\\\\.\\DISPLAY1",
+      "summary": " [\\\\.\\DISPLAY1] 1606x813@60.000 VGA",
+      "resolution": {
+        "width": 1606,
+        "height": 813
+      },
+      "refreshRateHz": 60.0,
+      "outputTechnology": {
+        "value": 0,
+        "name": "VGA"
+      },
+      "scanLineOrdering": {
+        "value": 1,
+        "interlaced": false
+      },
+      "dpiScalingPercent": null,
+      "dxgiColorSpace": null,
+      "color": null
+    }
+  ]
+}
+```
+
 ## Feature detection
 
 - Monitor/display device name(s)
