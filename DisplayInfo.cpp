@@ -164,26 +164,34 @@ static bool IsHelpArg(std::wstring_view arg)
 static void PrintUsage()
 {
 	std::wcout
-		<< L"DisplayInfo: Win32 CLI to summarize connected/enabled displays.\n\n"
-		<< L"Usage: DisplayInfo [--json] [-h|--help|/h|/Help]\n\n"
+		<< L"DisplayInfo: Win32 CLI to summarize connected/enabled displays.\n"
+		<< L"\n"
+		<< L"Usage: DisplayInfo [--json] [-h|--help|/h|/Help]\n"
+		<< L"\n"
 		<< L"Windows version support:\n"
 		<< L"  - Windows 7+: display names, resolution, refresh rate, connector type\n"
 		<< L"  - Windows 8.1+: per-monitor DPI scaling\n"
 		<< L"  - Windows 10 1607+: HDR/advanced color support + per-thread DPI awareness\n"
-		<< L"  - Windows 11 24H2+: wide color support state + active color mode\n\n"
+		<< L"  - Windows 11 24H2+: wide color support state + active color mode\n"
+		<< L"\n"
 		<< L"Detected features:\n"
 		<< L"  - Display/monitor names, resolution, refresh rate\n"
 		<< L"  - Connector type (VGA/DVI/HDMI/DisplayPort/internal)\n"
 		<< L"  - DPI scaling percentage\n"
-		<< L"  - Color encoding/bit depth, HDR, advanced color, DXGI color space\n\n"
+		<< L"  - Color encoding/bit depth, HDR, advanced color, DXGI color space\n"
+		<< L"\n"
 		<< L"Options:\n"
 		<< L"  --json         Output structured JSON (pretty-printed)\n"
 		<< L"  -h | --help    Show this help\n"
-		<< L"  /h | /help\n\n"
+		<< L"  /h | /help\n"
+		<< L"\n"
 		<< L"Build metadata:\n"
 		<< L"  Version: " << Utf8ToWide(DISPLAYINFO_VERSION_TAG) << L"\n"
 		<< L"  Commit:  " << Utf8ToWide(DISPLAYINFO_GIT_COMMIT) << L"\n"
-		<< L"  Built:   " << Utf8ToWide(DISPLAYINFO_BUILD_TIMESTAMP) << L"\n";
+		<< L"  Built:   " << Utf8ToWide(DISPLAYINFO_BUILD_TIMESTAMP) << L"\n"
+		<< L"\n"
+		<< L"https://github.com/acdvorak/win32-displayinfo" << "\n"
+		<< L"";
 }
 
 static json DisplayConfigToJson(const DisplayConfig_t& config, long dpiScalePercent, DXGI_COLOR_SPACE_TYPE colorSpace)
