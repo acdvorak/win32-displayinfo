@@ -134,7 +134,19 @@ Display:  [\\.\DISPLAY1] 1606x813@60.000 VGA
   - Wide color supported and enabled/disabled
   - Active color mode (SDR/WCG/HDR)
 
-## Vendored dependencies
+## Building
+
+### Prerequisites
+
+[VS 2022 Build Tools (LTSC)](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history#fixed-version-bootstrappers)
+
+Use [`.vsconfig`](./.vsconfig) to select the minimum necessary dependencies:
+
+- MSVC v143 - VS 2022 C++ x64/86 build tools
+- C++ CMake tools for Windows
+- Windows 10 SDK
+
+### Vendored dependencies
 
 - `nlohmann/json` `v3.11.3` is vendored as a single header:
   - `third_party/nlohmann/json.hpp`
