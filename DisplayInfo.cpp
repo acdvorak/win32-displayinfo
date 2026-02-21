@@ -1,18 +1,18 @@
 #include "DisplayConfig/DisplayConfig.h"
 
-#include <shellscalingapi.h>
-#include <nlohmann/json.hpp>
-
+#include <cmath>
+#include <cwctype>
 #include <iostream>
 #include <map>
-#include <cmath>
 #include <string_view>
-#include <cwctype>
 
 #include <dxgi.h>
 #include <dxgi1_6.h>
-
+#include <shellscalingapi.h>
 #include <wrl/client.h>
+
+#include <nlohmann/json.hpp>
+
 using Microsoft::WRL::ComPtr;
 using nlohmann::json;
 
