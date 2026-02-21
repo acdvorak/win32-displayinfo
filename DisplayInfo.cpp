@@ -157,7 +157,6 @@ static bool IsHelpArg(std::wstring_view arg)
 	if (arg == L"-h" || arg == L"--help") {
 		return true;
 	}
-
 	return EqualsIgnoreCaseAscii(arg, L"/h") || EqualsIgnoreCaseAscii(arg, L"/help");
 }
 
