@@ -2,6 +2,18 @@ $ErrorActionPreference = "Stop"
 
 $Configuration = "Debug"
 $Generator = "Visual Studio 17 2022"
+$VsWherePath = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio/Installer/vswhere.exe"
+
+if (-not (Test-Path $VsWherePath)) {
+	throw "vswhere.exe was not found at: $VsWherePath"
+}
+
+$VsInstallationPath = & $VsWherePath -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+if (-not $VsInstallationPath) {
+	throw "No Visual Studio Build Tools instance with VC tools was found. Re-run deps.ps1 and ensure C++ Build Tools are installed."
+}
+
+$VsInstallationPath = $VsInstallationPath.Trim()
 $Platforms = @(
 	@{ CMakePlatform = "Win32"; OutputArch = "x86" },
 	@{ CMakePlatform = "x64"; OutputArch = "x64" }
@@ -23,7 +35,7 @@ foreach ($Platform in $Platforms) {
 		Remove-Item $CMakeFilesDir -Recurse -Force
 	}
 
-	cmake -S $PSScriptRoot -B $BuildDir -G $Generator -A $Platform.CMakePlatform
+	cmake -S $PSScriptRoot -B $BuildDir -G $Generator -A $Platform.CMakePlatform -DCMAKE_GENERATOR_INSTANCE="$VsInstallationPath"
 	cmake --build $BuildDir --config $Configuration
 
 	$BuiltExePath = Join-Path $BuildDir "$Configuration/DisplayInfo.exe"
