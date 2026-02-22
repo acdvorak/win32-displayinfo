@@ -39,10 +39,9 @@ if (-not (Test-Path $BuildToolsExe)) {
 
 $arguments = @(
 	"--config", $VsConfigPath,
-	"--quiet",
-	"--wait",
-	"--norestart",
-	"--nocache"
+	"--passive",  # Show progress UI; no user input needed
+	"--wait",     # Block the shell until the installation completes
+	"--norestart" # Don't prompt the user to restart
 )
 
 Write-Host "Installing minimal VS 2022 Build Tools:"
@@ -58,17 +57,10 @@ foreach ($component in $components) {
 	Write-Host "  - $component"
 }
 
-$addArguments = @()
-foreach ($component in $components) {
-	$addArguments += "--add"
-	$addArguments += $component
-}
-
 Write-Host ""
 Write-Host "This may take several minutes..."
 
-$installArguments = @($arguments + $addArguments)
-$process = Start-Process -FilePath $BuildToolsExe -ArgumentList $installArguments -Wait -PassThru
+$process = Start-Process -FilePath $BuildToolsExe -ArgumentList $arguments -Wait -PassThru
 if ($process.ExitCode -ne 0) {
 	throw "vs_BuildTools.exe failed with exit code $($process.ExitCode)."
 }
