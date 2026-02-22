@@ -16,6 +16,27 @@ if (-not $isAdmin) {
 		"-File", "`"$scriptPath`""
 	)
 
+	Write-Host ""
+
+	################################################################################
+	# Validate toolchain
+	################################################################################
+
+	$vsDevCmdPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
+	if (-not (Test-Path $vsDevCmdPath)) {
+		throw "VsDevCmd.bat was not found at '$vsDevCmdPath'."
+	}
+
+	$validationCommand = "`"$vsDevCmdPath`" -arch=x64 && where cl && where link && where rc"
+	cmd /c $validationCommand
+	if ($LASTEXITCODE -ne 0) {
+		throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure Windows 10 SDK is installed in VS Build Tools Installer."
+	}
+
+	Write-Host ""
+	Write-Host "Visual Studio Build Tools verification succeeded (cl/link/rc found)."
+	Write-Host ""
+
 	exit $elevated.ExitCode
 }
 
@@ -59,23 +80,3 @@ $process = Start-Process -FilePath $buildToolsExe -ArgumentList $arguments -Wait
 if ($process.ExitCode -ne 0) {
 	throw "vs_BuildTools.exe failed with exit code $($process.ExitCode)."
 }
-
-Write-Host ""
-
-################################################################################
-# Validate toolchain
-################################################################################
-
-$vsDevCmdPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-if (-not (Test-Path $vsDevCmdPath)) {
-	throw "VsDevCmd.bat was not found at '$vsDevCmdPath'."
-}
-
-$validationCommand = "`"$vsDevCmdPath`" -arch=x64 && where cl && where link && where rc"
-cmd /c $validationCommand
-if ($LASTEXITCODE -ne 0) {
-	throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure Windows 10 SDK is installed in VS Build Tools Installer."
-}
-
-Write-Host ""
-Write-Host "Visual Studio Build Tools verification succeeded (cl/link/rc found)."
