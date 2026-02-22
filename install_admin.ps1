@@ -49,7 +49,7 @@ $vsConfigPath = Join-Path $PSScriptRoot ".vsconfig"
 
 if (-not (Test-Path $buildToolsExe)) {
 	Write-Host "Downloading VS 2022 Build Tools installer..."
-	Invoke-WebRequest "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile $buildToolsExe
+	Invoke-WebRequest "https://aka.ms/vs/17/release/vs_BuildTools.exe" -OutFile $buildToolsExe -UseBasicParsing -ErrorAction Stop
 }
 
 $arguments = @(
