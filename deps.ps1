@@ -41,7 +41,31 @@ foreach ($component in $components) {
 	Write-Host "  - $component"
 }
 
-$process = Start-Process -FilePath $BuildToolsExe -ArgumentList $arguments -Wait -PassThru
+$addArguments = @()
+foreach ($component in $components) {
+	$addArguments += "--add"
+	$addArguments += $component
+}
+
+Write-Host ""
+Write-Host "This may take several minutes..."
+
+$installArguments = @($arguments + $addArguments)
+$process = Start-Process -FilePath $BuildToolsExe -ArgumentList $installArguments -Wait -PassThru
 if ($process.ExitCode -ne 0) {
 	throw "vs_BuildTools.exe failed with exit code $($process.ExitCode)."
 }
+
+$vsDevCmdPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
+if (-not (Test-Path $vsDevCmdPath)) {
+	throw "VsDevCmd.bat was not found at '$vsDevCmdPath'."
+}
+
+$validationCommand = "\"$vsDevCmdPath\" -arch=x64 && where cl && where link && where rc"
+cmd /c $validationCommand
+if ($LASTEXITCODE -ne 0) {
+	throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure Windows 10 SDK is installed in VS Build Tools Installer."
+}
+
+Write-Host ""
+Write-Host "Visual Studio Build Tools verification succeeded (cl/link/rc found)."
