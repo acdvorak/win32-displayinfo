@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $Configuration = "Debug"
+$Generator = "Visual Studio 17 2022"
 $Platforms = @(
 	@{ CMakePlatform = "Win32"; OutputArch = "x86" },
 	@{ CMakePlatform = "x64"; OutputArch = "x64" }
@@ -11,8 +12,18 @@ New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 
 foreach ($Platform in $Platforms) {
 	$BuildDir = Join-Path $PSScriptRoot "build/$($Platform.CMakePlatform)"
+	$CMakeCachePath = Join-Path $BuildDir "CMakeCache.txt"
+	$CMakeFilesDir = Join-Path $BuildDir "CMakeFiles"
 
-	cmake -S $PSScriptRoot -B $BuildDir -A $Platform.CMakePlatform
+	if (Test-Path $CMakeCachePath) {
+		Remove-Item $CMakeCachePath -Force
+	}
+
+	if (Test-Path $CMakeFilesDir) {
+		Remove-Item $CMakeFilesDir -Recurse -Force
+	}
+
+	cmake -S $PSScriptRoot -B $BuildDir -G $Generator -A $Platform.CMakePlatform
 	cmake --build $BuildDir --config $Configuration
 
 	$BuiltExePath = Join-Path $BuildDir "$Configuration/DisplayInfo.exe"
