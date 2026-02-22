@@ -1,8 +1,9 @@
 # DisplayInfo
 
-Win32 CLI.
+Windows CLI that prints a summary (or structured JSON) of all connected/enabled
+displays.
 
-Shows a summary of connected/enabled displays.
+Supports Windows 7 SP1 and newer, both 32-bit and 64-bit.
 
 ## Usage
 
@@ -16,14 +17,16 @@ DisplayInfo.exe --json
 
 ## Windows 10 PC
 
-- HP Z420
+- [HP Z420](https://support.hp.com/us-en/product/details/hp-z420-workstation/5225033)
 - Windows 10 Pro `22H2` build `19045.6466`
-- NVIDIA Quadro 600 GPU
-- Two external monitors:
-  - Samsung S95C (DisplayPort-to-HDMI adapter)
-  - Dell ST2320L (DVI-D)
+- [NVIDIA Quadro 600 GPU](https://www.techpowerup.com/gpu-specs/quadro-600.c1318)
+- Two external displays:
+  - [Samsung S95C TV](https://www.rtings.com/tv/reviews/samsung/s95c-oled)
+    (DisplayPort-to-HDMI adapter)
+  - [Dell ST2320L monitor](https://i.dell.com/images/global/products/monitors/ST2320L_ST2321L.pdf)
+    (DVI-D)
 
-In-person physical displays (no RDP):
+In-person (no RDP):
 
 ```
 Display: QCQ95S [\\.\DISPLAY1] 1900x1058@60.000 HDMI, Color Space: DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
@@ -221,7 +224,7 @@ Display:  [\\.\DISPLAY1] 1606x813@60.000 VGA
 
 # Windows version support
 
-- Windows 7+:
+- Windows 7 SP1+:
   - Monitor/display names
   - Resolution
   - Refresh rate
@@ -243,13 +246,23 @@ Display:  [\\.\DISPLAY1] 1606x813@60.000 VGA
 
 ### Prerequisites
 
-[VS 2022 Build Tools (LTSC)](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history#fixed-version-bootstrappers)
+- Windows 10 or newer
 
-Use [`.vsconfig`](./.vsconfig) to select the minimum necessary dependencies:
+Run:
 
-- MSVC v143 - VS 2022 C++ x64/86 build tools
-- C++ CMake tools for Windows
-- Windows 10 SDK
+```ps1
+.\deps.ps1
+```
+
+This will install all necessary dependencies:
+
+- [`winget`](https://aka.ms/winget)
+- [CMake](https://cmake.org/)
+- [VS 2022 Build Tools installer](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-history#fixed-version-bootstrappers)
+  - MSVC v143 - VS 2022 C++ x64/86 build tools
+  - C++ CMake tools for Windows
+  - Windows 11 SDK v10.26100
+  - MSBuild
 
 ### Vendored dependencies
 
