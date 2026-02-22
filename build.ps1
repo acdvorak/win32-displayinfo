@@ -1,7 +1,6 @@
 $ErrorActionPreference = "Stop"
 
 $Configuration = "Debug"
-$Generator = "Visual Studio 17 2022"
 $VsWherePath = Join-Path ${env:ProgramFiles(x86)} `
 	"Microsoft Visual Studio/Installer/vswhere.exe"
 
@@ -21,16 +20,16 @@ if (-not $VsInstallationPath) {
 }
 
 $VsInstallationPath = $VsInstallationPath.Trim()
-$Platforms = @(
-	@{ CMakePlatform = "Win32"; OutputArch = "x86" },
-	@{ CMakePlatform = "x64"; OutputArch = "x64" }
+$PresetBuilds = @(
+	@{ ConfigurePreset = "Win32"; BuildPreset = "Win32-Debug"; OutputArch = "x86" },
+	@{ ConfigurePreset = "x64"; BuildPreset = "x64-Debug"; OutputArch = "x64" }
 )
 
 $BinDir = Join-Path $PSScriptRoot "bin"
 New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 
-foreach ($Platform in $Platforms) {
-	$BuildDir = Join-Path $PSScriptRoot "build/$($Platform.CMakePlatform)"
+foreach ($PresetBuild in $PresetBuilds) {
+	$BuildDir = Join-Path $PSScriptRoot "out/$($PresetBuild.ConfigurePreset)"
 	$CMakeCachePath = Join-Path $BuildDir "CMakeCache.txt"
 	$CMakeFilesDir = Join-Path $BuildDir "CMakeFiles"
 
@@ -41,15 +40,15 @@ foreach ($Platform in $Platforms) {
 		Remove-Item $CMakeFilesDir -Recurse -Force
 	}
 
-	cmake -S $PSScriptRoot -B $BuildDir -G $Generator -A $Platform.CMakePlatform `
+	cmake --preset $PresetBuild.ConfigurePreset `
 		-DCMAKE_GENERATOR_INSTANCE="$VsInstallationPath"
 
-	cmake --build $BuildDir --config $Configuration
+	cmake --build --preset $PresetBuild.BuildPreset
 
 	$BuiltExePath = Join-Path $BuildDir "$Configuration/DisplayInfo.exe"
-	$DestExePath  = Join-Path $BinDir   "DisplayInfo-$($Platform.OutputArch).exe"
+	$DestExePath  = Join-Path $BinDir   "DisplayInfo-$($PresetBuild.OutputArch).exe"
 	$BuiltPdbPath = Join-Path $BuildDir "$Configuration/DisplayInfo.pdb"
-	$DestPdbPath  = Join-Path $BinDir   "DisplayInfo-$($Platform.OutputArch).pdb"
+	$DestPdbPath  = Join-Path $BinDir   "DisplayInfo-$($PresetBuild.OutputArch).pdb"
 
 	if (-not (Test-Path $BuiltExePath)) {
 		throw "Expected build output not found: $BuiltExePath"
