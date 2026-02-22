@@ -20,6 +20,24 @@
 
 #pragma once
 
+/*
+These macros are likely a non-MSVC build guard for header behavior and
+MinGW/alt-toolchain compatibility.
+
+The macros determine what Windows SDK declarations/macros are visible at compile
+time, and the paired define of `NTDDI_VERSION` to `WINBLUE` likely ensures
+predictable preprocessor paths for the later fallback typedef/enum blocks,
+regardless of SDK age.
+
+`WINVER=0x0605` is a non-standard value (see
+https://learn.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt?view=msvc-170),
+so the likely intent was a "synthetic midpoint" (newer than 8.1, older than 10)
+to steer header conditionals, or simply a legacy hack/typo that stuck.
+
+So the most likely purpose is compile-time SDK shaping for non-MSVC builds.
+
+Runtime gating and this macro block solve different problems.
+*/
 #ifndef _MSC_VER
 #define WINVER 0x0605
 #define NTDDI_VERSION NTDDI_WINBLUE
