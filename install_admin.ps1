@@ -30,7 +30,7 @@ if (-not $isAdmin) {
 	$validationCommand = "`"$vsDevCmdPath`" -arch=x64 && where cl && where link && where rc"
 	cmd /c $validationCommand
 	if ($LASTEXITCODE -ne 0) {
-		throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure Windows 10 SDK is installed in VS Build Tools Installer."
+		throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure a Windows SDK that includes rc.exe is installed via the VS Build Tools Installer."
 	}
 
 	Write-Host ""
