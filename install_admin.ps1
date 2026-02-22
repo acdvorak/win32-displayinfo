@@ -61,8 +61,12 @@ $arguments = @(
 
 Write-Host "Installing minimal VS 2022 Build Tools:"
 
+if (-not (Test-Path $vsConfigPath)) {
+	throw ".vsconfig was not found at '$vsConfigPath'."
+}
+
 try {
-	$vsConfig = Get-Content -Path $vsConfigPath -Raw | ConvertFrom-Json
+	$vsConfig = Get-Content -Path $vsConfigPath -Raw -ErrorAction Stop | ConvertFrom-Json
 } catch {
 	throw "Failed to parse .vsconfig at '$vsConfigPath': $($_.Exception.Message)"
 }
