@@ -20,17 +20,9 @@
 
 #pragma once
 
-// Minimum supported OS: Windows 7 SP1
 #ifndef _MSC_VER
-#ifndef WINVER
-#define WINVER 0x0601
-#endif
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0601
-#endif
-#ifndef NTDDI_VERSION
-#define NTDDI_VERSION 0x06010100
-#endif
+#define WINVER 0x0605
+#define NTDDI_VERSION NTDDI_WINBLUE
 #endif
 
 #include <Windows.h>

@@ -47,13 +47,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Minimum supported OS: Windows 7 SP1
-add_compile_definitions(
-    WINVER=0x0601
-    _WIN32_WINNT=0x0601
-    NTDDI_VERSION=0x06010100
-)
-
 option(STATIC_CRT "Static runtime" ON)
 
 add_executable(${PROJECT_NAME} DisplayInfo.cpp "${CMAKE_CURRENT_SOURCE_DIR}/DisplayConfig/DisplayConfig.cpp")
