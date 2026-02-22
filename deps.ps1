@@ -1,3 +1,5 @@
+# Windows PowerShell v5.1
+
 $BuildToolsExe = Join-Path $PSScriptRoot "vs_BuildTools.exe"
 $VsConfigPath = Join-Path $PSScriptRoot ".vsconfig"
 
@@ -61,7 +63,7 @@ if (-not (Test-Path $vsDevCmdPath)) {
 	throw "VsDevCmd.bat was not found at '$vsDevCmdPath'."
 }
 
-$validationCommand = "\"$vsDevCmdPath\" -arch=x64 && where cl && where link && where rc"
+$validationCommand = "`"$vsDevCmdPath`" -arch=x64 && where cl && where link && where rc"
 cmd /c $validationCommand
 if ($LASTEXITCODE -ne 0) {
 	throw "VC tools installed, but Windows SDK resource compiler (rc.exe) is unavailable. Ensure Windows 10 SDK is installed in VS Build Tools Installer."
