@@ -28,7 +28,19 @@ $arguments = @(
 	"--nocache"
 )
 
-Write-Host "Installing minimal VS 2022 Build Tools..."
+Write-Host "Installing minimal VS 2022 Build Tools:"
+
+try {
+	$vsConfig = Get-Content -Path $VsConfigPath -Raw | ConvertFrom-Json
+} catch {
+	throw "Failed to parse .vsconfig at '$VsConfigPath': $($_.Exception.Message)"
+}
+
+$components = @($vsConfig.components | Where-Object { $_ -is [string] -and -not [string]::IsNullOrWhiteSpace($_) })
+foreach ($component in $components) {
+	Write-Host "  - $component"
+}
+
 $process = Start-Process -FilePath $BuildToolsExe -ArgumentList $arguments -Wait -PassThru
 if ($process.ExitCode -ne 0) {
 	throw "vs_BuildTools.exe failed with exit code $($process.ExitCode)."
