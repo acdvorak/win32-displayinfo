@@ -9,7 +9,11 @@ if ($null -eq $winget) {
 	Write-Host "winget not found. Installing App Installer for current user..."
 
 	$wingetBundlePath = Join-Path $env:TEMP "Microsoft.DesktopAppInstaller.msixbundle"
-	Invoke-WebRequest "https://aka.ms/getwinget" -OutFile $wingetBundlePath
+	try {
+		Invoke-WebRequest "https://aka.ms/getwinget" -OutFile $wingetBundlePath -UseBasicParsing -ErrorAction Stop
+	} catch {
+		throw "Failed to download winget bootstrap package. Check your internet connection or download App Installer manually from Microsoft Store and re-run this script. Details: $($_.Exception.Message)"
+	}
 
 	try {
 		Add-AppxPackage -Path $wingetBundlePath -ErrorAction Stop
