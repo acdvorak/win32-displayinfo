@@ -42,8 +42,14 @@ foreach ($PresetBuild in $PresetBuilds) {
 
 	cmake --preset $PresetBuild.ConfigurePreset `
 		-DCMAKE_GENERATOR_INSTANCE="$VsInstallationPath"
+	if ($LASTEXITCODE -ne 0) {
+		throw "CMake configure failed for preset '$($PresetBuild.ConfigurePreset)' with exit code $LASTEXITCODE."
+	}
 
 	cmake --build --preset $PresetBuild.BuildPreset
+	if ($LASTEXITCODE -ne 0) {
+		throw "CMake build failed for preset '$($PresetBuild.BuildPreset)' with exit code $LASTEXITCODE."
+	}
 
 	$BuiltExePath = Join-Path $BuildDir "$Configuration/DisplayInfo.exe"
 	$DestExePath  = Join-Path $BinDir   "DisplayInfo-$($PresetBuild.OutputArch).exe"
