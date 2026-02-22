@@ -68,9 +68,13 @@ if ($null -eq $cmakeCommand) {
 	}
 
 	# Refresh PATH in the current session so cmake can be resolved immediately.
-	$userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+	$processPath = [Environment]::GetEnvironmentVariable("Path", "Process")
+	$userPath    = [Environment]::GetEnvironmentVariable("Path", "User")
 	$machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
-	$env:Path = "$userPath;$machinePath"
+	$env:Path    = @($processPath, $userPath, $machinePath) |
+		Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+		ForEach-Object { $_.TrimEnd(';') } |
+		Join-String -Separator ';'
 }
 
 $cmake = Get-Command cmake.exe -ErrorAction SilentlyContinue
